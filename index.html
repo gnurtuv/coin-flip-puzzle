@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Flip Puzzle</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1.2em;
+        }
+
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 8px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .coin {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .coin:hover::before {
+            opacity: 1;
+            animation: shine 0.6s ease;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        .coin.heads {
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+            color: #333;
+            border-color: #b8860b;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .coin.tails {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            border-color: #8b0000;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin:hover {
+            transform: scale(1.1) rotateY(15deg);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .coin:active {
+            transform: scale(0.95);
+        }
+
+        .flipping {
+            animation: flip 0.6s ease-in-out;
+        }
+
+        @keyframes flip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg) scale(1.1); }
+            100% { transform: rotateY(0deg); }
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .size-controls {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .size-controls label {
+            font-weight: bold;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+        }
+
+        .win-message {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: celebrate 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .rules {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .rules h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+
+        @media (max-width: 600px) {
+            .coin {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪙 Coin Flip Puzzle</h1>
+        <p class="subtitle">Turn all coins to heads by flipping them strategically!</p>
+        
+        <div class="game-info">
+            <div>Moves: <span id="moveCount">0</span></div>
+            <div>Target: All Heads</div>
+        </div>
+
+        <div class="size-controls">
+            <label for="gridSize">Grid Size:</label>
+            <select id="gridSize">
+                <option value="3">3×3</option>
+                <option value="4" selected>4×4</option>
+                <option value="5">5×5</option>
+                <option value="6">6×6</option>
+            </select>
+        </div>
+
+        <div class="grid-container">
+            <div id="gameGrid" class="grid"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="newGame()">New Game</button>
+            <button class="btn-secondary" onclick="resetGame()">Reset</button>
+            <button class="btn-success" onclick="showHint()">Hint</button>
+        </div>
+
+        <div id="winMessage" class="win-message" style="display: none;">
+            🎉 Congratulations! You solved it in <span id="finalMoves"></span> moves! 🎉
+        </div>
+
+        <div class="rules">
+            <h3>How to Play:</h3>
+            <p>• Click any coin to flip it and all adjacent coins (up, down, left, right)</p>
+            <p>• H = Heads (gold), T = Tails (red)</p>
+            <p>• Goal: Get all coins showing heads</p>
+            <p>• Try to solve in as few moves as possible!</p>
+        </div>
+    </div>
+
+    <script>
+        let grid = [];
+        let gridSize = 4;
+        let moves = 0;
+        let initialState = [];
+
+        function createGrid() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+            gameGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            
+            // Start with all heads (solved state)
+            grid = [];
+            for (let i = 0; i < gridSize; i++) {
+                grid[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    grid[i][j] = 'H';
+                }
+            }
+            
+            // Generate solvable puzzle by making random moves
+            // This ensures the puzzle can be solved by reversing those moves
+            const numRandomMoves = Math.floor(Math.random() * (gridSize * 2)) + gridSize;
+            for (let move = 0; move < numRandomMoves; move++) {
+                const randomRow = Math.floor(Math.random() * gridSize);
+                const randomCol = Math.floor(Math.random() * gridSize);
+                performFlip(randomRow, randomCol);
+            }
+            
+            // Create visual elements
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const coin = document.createElement('div');
+                    coin.className = `coin ${grid[i][j] === 'H' ? 'heads' : 'tails'}`;
+                    coin.textContent = grid[i][j];
+                    coin.onclick = () => flipCoin(i, j);
+                    coin.dataset.row = i;
+                    coin.dataset.col = j;
+                    
+                    gameGrid.appendChild(coin);
+                }
+            }
+            
+            // Store initial state for reset
+            initialState = grid.map(row => [...row]);
+        }
+
+        function performFlip(row, col) {
+            // Flip without animation or UI updates - used for puzzle generation
+            const positions = [
+                [row, col], // Center
+                [row - 1, col], // Up
+                [row + 1, col], // Down
+                [row, col - 1], // Left
+                [row, col + 1]  // Right
+            ];
+
+            positions.forEach(([r, c]) => {
+                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                    grid[r][c] = grid[r][c] === 'H' ? 'T' : 'H';
+                }
+            });
+        }
+
+        function flipCoin(row, col) {
+            if (document.getElementById('winMessage').style.display !== 'none') {
+                return; // Game already won
+            }
+
+            moves++;
+            document.getElementById('moveCount').textContent = moves;
+
+            performFlipWithAnimation(row, col);
+
+            // Check for win condition after animation
+            setTimeout(checkWin, 600);
+        }
+
+        function performFlipWithAnimation(row, col) {
+            // Array of positions to flip (center + adjacent)
+            const positions = [
+                [row, col], // Center
+                [row - 1, col], // Up
+                [row + 1, col], // Down
+                [row, col - 1], // Left
+                [row, col + 1]  // Right
+            ];
+
+            // Flip coins at valid positions
+            positions.forEach(([r, c]) => {
+                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                    grid[r][c] = grid[r][c] === 'H' ? 'T' : 'H';
+                    
+                    // Update visual representation with animation
+                    const coinElement = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                    coinElement.classList.add('flipping');
+                    
+                    setTimeout(() => {
+                        coinElement.textContent = grid[r][c];
+                        coinElement.className = `coin ${grid[r][c] === 'H' ? 'heads' : 'tails'}`;
+                        coinElement.classList.remove('flipping');
+                    }, 300);
+                }
+            });
+        }
+
+        function checkWin() {
+            const allHeads = grid.every(row => row.every(cell => cell === 'H'));
+            
+            if (allHeads) {
+                document.getElementById('finalMoves').textContent = moves;
+                document.getElementById('winMessage').style.display = 'block';
+                
+                // Add celebration effect to all coins
+                document.querySelectorAll('.coin').forEach(coin => {
+                    coin.style.animation = 'celebrate 0.5s ease-in-out infinite alternate';
+                });
+            }
+        }
+
+        function newGame() {
+            moves = 0;
+            document.getElementById('moveCount').textContent = moves;
+            document.getElementById('winMessage').style.display = 'none';
+            
+            // Clear any celebration animations
+            document.querySelectorAll('.coin').forEach(coin => {
+                coin.style.animation = '';
+            });
+            
+            createGrid();
+        }
+
+        function resetGame() {
+            moves = 0;
+            document.getElementById('moveCount').textContent = moves;
+            document.getElementById('winMessage').style.display = 'none';
+            
+            // Clear any celebration animations
+            document.querySelectorAll('.coin').forEach(coin => {
+                coin.style.animation = '';
+            });
+            
+            // Restore initial state
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    grid[i][j] = initialState[i][j];
+                    const coinElement = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+                    coinElement.textContent = grid[i][j];
+                    coinElement.className = `coin ${grid[i][j] === 'H' ? 'heads' : 'tails'}`;
+                }
+            }
+        }
+
+        function showHint() {
+            alert("💡 Hint: Try to work backwards! Think about what the final state should look like and which coins need to be flipped to get there. Corner and edge coins are often good starting points since they have fewer neighbors!");
+        }
+
+        // Handle grid size changes
+        document.getElementById('gridSize').addEventListener('change', function() {
+            gridSize = parseInt(this.value);
+            newGame();
+        });
+
+        // Initialize the game
+        createGrid();
+    </script>
+</body>
+</html>
