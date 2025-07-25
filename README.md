@@ -38,9 +38,9 @@ Transform a chaotic grid of mixed coins into perfect golden harmony! This isn't 
 ### Visual Guide
 ```
 Initial State:          After Clicking Center:
-H T H T                 T H T T
-T H T H        →        H T H T
-H T H T                 T H T T
+H T H T                 H H H T
+T H T H        →        H T H H
+H T H T                 H H H T
 T H T H                 T H T H
 ```
 
